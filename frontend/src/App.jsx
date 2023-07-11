@@ -1,12 +1,16 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './App.css'
-import Button from "@mui/material/Button";
+import Homepage from './pages/Homepage';
 
 function App() {
 
   return (
     <>
-      <div className="text-blue-700">Hello World!</div>
-      <Button variant="outlined" className='text-black'>Outlined</Button>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Homepage />} />
+        </Routes>
+      </Router>
     </>
   );
 }
