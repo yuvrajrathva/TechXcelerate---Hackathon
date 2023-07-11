@@ -1,1 +1,1 @@
-# TechXcelerate---Hackathon
+# TechXcelerate-Hackathon
