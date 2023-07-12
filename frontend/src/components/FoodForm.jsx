@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -21,7 +22,6 @@ const FoodForm = ({ open, handleClose }) => {
   const [location, setLocation] = useState("");
   const [customLocation, setCustomLocation] = useState("");
 
-
   const handleFoodTypeChange = (event) => {
     setFoodType(event.target.value);
     console.log(foodType);
@@ -38,8 +38,24 @@ const FoodForm = ({ open, handleClose }) => {
   };
 
   const handleCurrentLocation = (event) => {
-    setLocation(event.target.value);
-    console.log(location);
+    const successCallback = (position) => {
+      console.log(position);
+      setLocation(event.target.value);
+
+      const getAddress = async (lat, long) => {
+        const response = await axios.get(
+          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${long}&localityLanguage=en`
+        );
+        console.log(response.data);
+      };
+      getAddress(position.coords.latitude, position.coords.longitude);
+    };
+
+    const errorCallback = (error) => {
+      console.log(error);
+    };
+
+    navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
   };
 
   const handleCustomLocation = () => {
@@ -145,10 +161,18 @@ const FoodForm = ({ open, handleClose }) => {
             Please Locate the location. A volunteer will pick that up 😊.
           </FormHelperText>
           <div className="flex flex-row flex-wrap justify-between gap-5">
-            <Button variant="outlined" className="mt-2" onClick={handleCurrentLocation}>
+            <Button
+              variant="outlined"
+              className="mt-2"
+              onClick={handleCurrentLocation}
+            >
               Current Location
             </Button>
-            <Button variant="outlined" className="mt-2" onClick={handleCustomLocation}>
+            <Button
+              variant="outlined"
+              className="mt-2"
+              onClick={handleCustomLocation}
+            >
               Custom Location
             </Button>
           </div>
