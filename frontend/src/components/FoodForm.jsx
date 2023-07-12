@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -22,31 +24,34 @@ const FoodForm = ({ open, handleClose }) => {
   const [location, setLocation] = useState("");
   const [customLocation, setCustomLocation] = useState("");
 
+  useEffect(() => {
+    setFoodType("");
+    setExpirationTime("");
+    setFoodWeight("");
+    setLocation("");
+    setCustomLocation("");
+  }, [open]);
+
   const handleFoodTypeChange = (event) => {
     setFoodType(event.target.value);
-    console.log(foodType);
   };
 
   const handleExpirationChange = (event) => {
     setExpirationTime(event.target.value);
-    console.log(expirationTime);
   };
 
   const handleFoodWeightChange = (event) => {
     setFoodWeight(event.target.value);
-    console.log(foodWeight);
   };
 
   const handleCurrentLocation = (event) => {
     const successCallback = (position) => {
-      console.log(position);
-      setLocation(event.target.value);
-
       const getAddress = async (lat, long) => {
         const response = await axios.get(
           `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${long}&localityLanguage=en`
         );
-        console.log(response.data);
+        setLocation(`${response.data.city}, ${response.data.countryName}`);
+        console.table(response.data);
       };
       getAddress(position.coords.latitude, position.coords.longitude);
     };
@@ -61,7 +66,28 @@ const FoodForm = ({ open, handleClose }) => {
   const handleCustomLocation = () => {
     console.log("custom location");
   };
-  
+
+  const handleSubmit = () => {
+    if (foodType === "" || expirationTime === "") {
+      toast.error(
+        `Please enter ${
+          foodType === "" ? "'Type of food'" : "'Estimated expiration time'"
+        } it is mandatory field 🙂`
+      );
+      return;
+    }
+
+    console.log("Food Type is: ", foodType);
+    console.log("Expire in: ", expirationTime);
+    console.log("Food weight is equal to: ", foodWeight);
+    console.log("Coordinates are: ", location);
+    console.log("Custom Location is: ", customLocation);
+
+    // Close the dialog
+    toast.success("Thank you for conribution 🤗");
+    handleClose();
+  };
+
   const FoodType = [
     "Vegetables",
     "Fruits",
@@ -86,7 +112,7 @@ const FoodForm = ({ open, handleClose }) => {
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Contribute for the better World</DialogTitle>
         <DialogContent className="flex flex-row gap-5 justify-between flex-wrap">
-          <FormControl fullWidth sx={{ minWidth: 80 }}>
+          <FormControl required fullWidth sx={{ minWidth: 80 }}>
             <FormHelperText className="ml-1">
               Enter the type of food*
             </FormHelperText>
@@ -97,15 +123,14 @@ const FoodForm = ({ open, handleClose }) => {
               onChange={handleFoodTypeChange}
               autoWidth
             >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
               {FoodType.map((food) => (
-                <MenuItem value={food}>{food}</MenuItem>
+                <MenuItem key={food} value={food}>
+                  {food}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>
-          <FormControl fullWidth sx={{ minWidth: 80 }}>
+          <FormControl required fullWidth sx={{ minWidth: 80 }}>
             <FormHelperText className="ml-1">
               Enter estimated expiration time*
             </FormHelperText>
@@ -116,11 +141,10 @@ const FoodForm = ({ open, handleClose }) => {
               onChange={handleExpirationChange}
               autoWidth
             >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
               {Expire.map((time) => (
-                <MenuItem value={time}>{time}</MenuItem>
+                <MenuItem key={time} value={time}>
+                  {time}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>
@@ -178,8 +202,9 @@ const FoodForm = ({ open, handleClose }) => {
           </div>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Send</Button>
+          <Button onClick={handleSubmit}>Send</Button>
         </DialogActions>
+        <ToastContainer />
       </Dialog>
     </>
   );
