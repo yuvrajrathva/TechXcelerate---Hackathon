@@ -17,7 +17,7 @@ export default {
           dark: "#c51162",
           contrastText: "#fff",
         },
-      },  
+      },
     },
   },
   plugins: [],
