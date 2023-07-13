@@ -1,40 +1,19 @@
 // import React from 'react'
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
 import Childrens from "../assets/bill-wegener-P0OJbBJ1ZTM-unsplash.jpg";
 import FoodForm from "../components/FoodForm";
-
-function SimpleDialog(props) {
-  const { onClose, open } = props;
-
-  const handleClose = () => {
-    onClose();
-  };
-
-  return (
-    <Dialog onClose={handleClose} open={open}>
-      <DialogTitle>Sign Up or Log In using Google </DialogTitle>
-      {/* I want to add a google button here */}
-      {/* want bg of colour code 285F4 */}
-      <Button className="bg-[#285F4] py-3 px-7 mx-5 mb-5" variant="outlined">
-        <img
-          src="https://img.icons8.com/color/48/000000/google-logo.png"
-          alt="google"
-          className="inline-block mr-2"
-        />
-        Sign Up with Google
-      </Button>
-    </Dialog>
-  );
-}
+import SimpleDialog from "../components/SignUp";
 
 const Homepage = () => {
+  const [logedIn, setLogedIn] = useState(false); // to check if user is loged in or not
   const [open, setOpen] = useState(false);
   const [openGoogleBtn, setOpenGoogleBtn] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleSignupOpen = () => {
     setOpenGoogleBtn(true);
@@ -60,6 +39,12 @@ const Homepage = () => {
       backgroundRepeat: "no-repeat",
     },
   };
+
+  useEffect(() => {
+    if (localStorage.getItem("email")) {
+      setLogedIn(true);
+    }
+  }, []);
 
   return (
     <>
@@ -87,13 +72,24 @@ const Homepage = () => {
             >
               Have Food
             </Button>
-            <Button
-              variant="contained"
-              className="py-3 bg-blue-700 px-7"
-              onClick={handleSignupOpen}
-            >
-              Volunteering
-            </Button>
+            {logedIn ? (
+              <Button
+                variant="contained"
+                className="py-3 bg-blue-700 px-7"
+                href="/dashboard"
+              >
+                Dashboard
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                className="py-3 bg-blue-700 px-7"
+                onClick={handleSignupOpen}
+              >
+                Volunteering
+              </Button>
+            )}
+
             <SimpleDialog open={openGoogleBtn} onClose={handleSignupClose} />
           </div>
         </Container>
